@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Meteo Screens</title>
+
+  <style>
+    :root{
+      color-scheme: light dark;
+
+      --bg: #0b0c10;
+      --card: rgba(255,255,255,.06);
+      --border: rgba(255,255,255,.14);
+      --border2: rgba(255,255,255,.22);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.72);
+
+      --radius: 16px;
+      --radius2: 12px;
+      --shadow: 0 10px 30px rgba(0,0,0,.30);
+
+      --danger: #ff3b30;
+
+      --topbarH: 52px;
+    }
+
+    @media (prefers-color-scheme: light){
+      :root{
+        --bg: #f6f7fb;
+        --card: rgba(0,0,0,.03);
+        --border: rgba(0,0,0,.12);
+        --border2: rgba(0,0,0,.20);
+        --text: rgba(0,0,0,.88);
+        --muted: rgba(0,0,0,.62);
+        --shadow: 0 10px 30px rgba(0,0,0,.10);
+      }
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(900px 600px at 10% 0%, rgba(125,211,252,.18), transparent 60%),
+        radial-gradient(900px 600px at 90% 20%, rgba(167,139,250,.14), transparent 60%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    .home{
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .card{
+      width: min(720px, 100%);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 22px;
+      backdrop-filter: blur(10px);
+    }
+    .header{
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    h1{ margin: 0; font-size: 22px; letter-spacing: .2px; }
+    .sub{ margin: 0; font-size: 13px; color: var(--muted); }
+
+    .grid-links{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    @media (max-width: 640px){
+      .grid-links{ grid-template-columns: 1fr; }
+    }
+
+    .setting{
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 14px 14px;
+      border-radius: var(--radius2);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      background: rgba(255,255,255,.02);
+      transition: transform .12s ease, border-color .12s ease, background .12s ease;
+      color: inherit;
+    }
+    .setting:hover{
+      transform: translateY(-1px);
+      border-color: var(--border2);
+      background: rgba(255,255,255,.05);
+    }
+    .setting-title{ font-weight: 650; }
+    .setting-desc{ font-size: 12px; color: var(--muted); line-height: 1.35; }
+
+    .hint{
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+    .hint .block{
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    .view{
+      height: 100vh;
+      padding-top: var(--topbarH);
+    }
+
+    .topbar{
+      position: fixed;
+      inset: 10px 10px auto 10px;
+      height: calc(var(--topbarH) - 20px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 12px;
+      z-index: 9999;
+      border-radius: 14px;
+      background: rgba(0,0,0,.48);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 22px rgba(0,0,0,.22);
+    }
+    @media (prefers-color-scheme: light){
+      .topbar{
+        background: rgba(255,255,255,.75);
+        border: 1px solid rgba(0,0,0,.12);
+      }
+    }
+
+    .topbar .title{
+      font-size: 13px;
+      font-weight: 650;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .topbar .actions{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .btn{
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.06);
+      text-decoration: none;
+      font-size: 12px;
+      line-height: 1;
+      cursor: pointer;
+      color: inherit;
+      user-select: none;
+    }
+    @media (prefers-color-scheme: light){
+      .btn{
+        border: 1px solid rgba(0,0,0,.12);
+        background: rgba(0,0,0,.04);
+      }
+    }
+    .btn[aria-pressed="true"]{
+      border-color: rgba(255,59,48,.55);
+      box-shadow: 0 0 0 2px rgba(255,59,48,.22) inset;
+    }
+
+    .pill{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    @media (prefers-color-scheme: light){
+      .pill{ border: 1px solid rgba(0,0,0,.12); }
+    }
+
+    .pane{
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: rgba(0,0,0,.06);
+    }
+
+    .split{
+      height: calc(100vh - var(--topbarH));
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 0;
+    }
+
+    .quad{
+      height: calc(100vh - var(--topbarH));
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 0;
+    }
+
+    .six{
+      height: calc(100vh - var(--topbarH));
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 0;
+    }
+
+    .danger-frame{
+      width: 100%;
+      height: 100%;
+      display: block;
+      position: relative;
+    }
+    .danger-frame.is-active{
+      outline: 12px solid var(--danger);
+      outline-offset: -4px;
+      z-index: 1;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+
+  <script>
+    // === Config ===
+    const KIRCHFELD = "https://kirchfeld.roundshot.com/#/";
+    const TZ = "Europe/Zurich";     // Switzerland local time
+    const START_MIN = 7 * 60 + 30;  // 07:30
+    const END_MIN   = 17 * 60 + 30; // 17:30
+
+    const configs = {
+      "1": { type: "split", title: "Setting 1: Pilatus und Horw", top: "https://pilatus.roundshot.com/#/", bottom: KIRCHFELD },
+      "2": { type: "split", title: "Setting 2: Eich und Ruswil", top: "https://meteoschweiz.roundshot.com/eich/#/", bottom: "https://ruswil.roundshot.com/#/" },
+      "3": { type: "split", title: "Setting 3: Cham und Wetzikon", top: "https://zug-stadt.roundshot.com/#/", bottom: "https://gzo.roundshot.com/#/" },
+      "4": {
+        type: "quad",
+        title: "Setting 4: Setting 1 links / Setting 2 rechts",
+        leftTop: "https://pilatus.roundshot.com/#/",
+        leftBottom: KIRCHFELD,
+        rightTop: "https://meteoschweiz.roundshot.com/eich/#/",
+        rightBottom: "https://ruswil.roundshot.com/#/"
+      },
+      "5": { type: "split", title: "Nachtflug 1 (Pilatus & Chaiserstuhl)", top: "https://pilatus.roundshot.com/#/", bottom: "https://meteoschweiz.roundshot.com/kaiserstuhl-nordost/#/" },
+      "6": { type: "split", title: "Nachtflug 2 (Rigi & Hasliberg)", top: "https://rigi.roundshot.com/#/", bottom: "https://alpentower.roundshot.com/#/" },
+      "7": {
+        type: "quad",
+        title: "Setting 7: Nachtflug 1 links / Nachtflug 2 rechts",
+        leftTop: "https://pilatus.roundshot.com/#/",
+        leftBottom: "https://meteoschweiz.roundshot.com/kaiserstuhl-nordost/#/",
+        rightTop: "https://rigi.roundshot.com/#/",
+        rightBottom: "https://alpentower.roundshot.com/#/"
+      },
+      "8": {
+        type: "six",
+        title: "Setting 8: 6er Split Nachtflug",
+        leftTop: "https://pilatus.roundshot.com/#/",
+        leftMid: "https://alpentower.roundshot.com/#/",
+        leftBottom: "https://meteoschweiz.roundshot.com/kaiserstuhl-nordost/#/",
+        rightTop: "https://rigi.roundshot.com/#/",
+        rightMid: "https://meteoschweiz.roundshot.com/eich/#/",
+        rightBottom: "https://meteoschweiz.roundshot.com/goldau/#/"
+      }
+    };
+
+    // === State ===
+    // null = normal (Zeitlogik), true = ROT erzwingen, false = ROT erzwingen AUS (niemals rot)
+    let forceRed = null;
+
+    // === Helpers ===
+    const app = document.getElementById("app");
+    const params = new URLSearchParams(location.search);
+    const setting = params.get("setting");
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[c]));
+    }
+
+    function minutesInZurich(date = new Date()){
+      const parts = new Intl.DateTimeFormat("de-CH", {
+        timeZone: TZ,
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).formatToParts(date);
+
+      const h = Number(parts.find(p => p.type === "hour")?.value ?? "0");
+      const m = Number(parts.find(p => p.type === "minute")?.value ?? "0");
+      return h * 60 + m;
+    }
+
+    // ROT nach 17:30 bis 07:30 (über Mitternacht)
+    function isNightRedWindowCH(){
+      const mins = minutesInZurich();
+      return (mins >= END_MIN) || (mins < START_MIN);
+    }
+
+    function formatZurichNow(){
+      const parts = new Intl.DateTimeFormat("de-CH", {
+        timeZone: TZ,
+        weekday: "short",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }).formatToParts(new Date());
+
+      const wd = parts.find(p=>p.type==="weekday")?.value ?? "";
+      const hh = parts.find(p=>p.type==="hour")?.value ?? "00";
+      const mm = parts.find(p=>p.type==="minute")?.value ?? "00";
+      return `CH ${wd} ${hh}:${mm}`;
+    }
+
+    function computeShouldBeRed(){
+      if (forceRed === true) return true;
+      if (forceRed === false) return false;
+      return isNightRedWindowCH();
+    }
+
+    function updateKirchfeldHighlight({ showFeedback = false } = {}){
+      const shouldBeRed = computeShouldBeRed();
+      const targets = document.querySelectorAll('[data-src="' + KIRCHFELD + '"]');
+
+      targets.forEach(el => el.classList.toggle("is-active", shouldBeRed));
+
+      const badge = document.getElementById("timeBadge");
+      if (badge){
+        const mode = forceRed === true ? "FORCED ROT"
+                   : forceRed === false ? "FORCED AUS"
+                   : (isNightRedWindowCH() ? "ROT (Nacht)" : "normal (Tag)");
+        badge.textContent = `${formatZurichNow()} • Kirchfeld: ${mode}`;
+      }
+
+      if (showFeedback){
+        const base = shouldBeRed
+          ? "✅ Kirchfeld sollte JETZT ROT umrandet sein."
+          : "ℹ️ Kirchfeld sollte JETZT NICHT rot umrandet sein.";
+        const extra = targets.length ? "" : " (Hinweis: Kirchfeld ist in diesem Setting nicht eingebunden.)";
+        alert(base + extra);
+      }
+    }
+
+    function paneHtml(src){
+      const safe = escapeHtml(src);
+      const isKirchfeld = src === KIRCHFELD;
+      const cls = isKirchfeld ? "danger-frame" : "";
+      const data = isKirchfeld ? `data-src="${escapeHtml(KIRCHFELD)}"` : "";
+      return `
+        <div class="${cls}" ${data}>
+          <iframe class="pane" src="${safe}" referrerpolicy="no-referrer"></iframe>
+        </div>
+      `;
+    }
+
+    function renderTopbar(title){
+      return `
+        <div class="topbar" role="navigation" aria-label="Topbar">
+          <div class="title">${escapeHtml(title)}</div>
+          <div class="actions">
+            <span class="pill" id="timeBadge" aria-live="polite"></span>
+
+            <button class="btn" id="checkBtn" type="button">Jetzt prüfen</button>
+
+            <button class="btn" id="forceBtn" type="button" aria-pressed="false" title="Schaltet: Auto → FORCED ROT → FORCED AUS → Auto">
+              ROT erzwingen
+            </button>
+
+            <a class="btn" href="${escapeHtml(location.pathname)}" target="_self">Startseite</a>
+          </div>
+        </div>
+      `;
+    }
+
+    // === Renderers ===
+    function renderHome(){
+      document.title = "Meteo Screens";
+      app.innerHTML = `
+        <div class="home">
+          <div class="card">
+            <div class="header">
+              <h1>Meteo Screens</h1>
+              <p class="sub">Split-Ansichten für Roundshot / Meteo</p>
+            </div>
+
+            <div class="grid-links">
+              <a class="setting" href="?setting=1" target="_blank" rel="noopener noreferrer">
+                <div class="setting-title">Setting 1</div>
+                <div class="setting-desc">Pilatus & Horw (Kirchfeld wird nachts rot markiert)</div>
+              </a>
+              <a class="setting" href="?setting=2" target="_blank" rel="noopener noreferrer">
+                <div class="setting-title">Setting 2</div>
+                <div class="setting-desc">Eich & Ruswil</div>
+              </a>
+              <a class="setting" href="?setting=3" target="_blank" rel="noopener noreferrer">
+                <div class="setting-title">Setting 3</div>
+                <div class="setting-desc">Cham & Wetzikon</div>
+              </a>
+              <a class="setting" href="?setting=4" target="_blank" rel="noopener noreferrer">
+                <div class="setting-title">Setting 4</div>
+                <div class="setting-desc">4er Split: Setting 1 links / Setting 2 rechts</div>
+              </a>
+
+              <a class="setting" href="?setting=5" target="_blank" rel="noopener noreferrer">
+                <div class="setting-title">Nachtflug 1</div>
+                <div class="setting-desc">Pilatus & Chaiserstuhl</div>
+              </a>
+              <a class="setting" href="?setting=6" target="_blank" rel="noopener noreferrer">
+                <div class="setting-title">Nachtflug 2</div>
+                <div class="setting-desc">Rigi & Hasliberg</div>
+              </a>
+              <a class="setting" href="?setting=7" target="_blank" rel="noopener noreferrer">
+                <div class="setting-title">Setting 7</div>
+                <div class="setting-desc">4er Split Nachtflug 1 & 2</div>
+              </a>
+              <a class="setting" href="?setting=8" target="_blank" rel="noopener noreferrer">
+                <div class="setting-title">Setting 8</div>
+                <div class="setting-desc">6er Split Nachtflug</div>
+              </a>
+            </div>
+
+            <div class="hint">
+              Tipp: Manche Seiten blockieren iframe-Einbettung (X-Frame-Options / CSP).<br>
+              Sonderregel: Wenn <b>${escapeHtml(KIRCHFELD)}</b> angezeigt wird, bekommt dieser Bereich <b>nach 17:30 bis 07:30 (Schweiz)</b> einen roten Rahmen.
+
+              <div class="block">
+                <b>Code und Quellen ohne Gewähr!</b><br>
+                Bei Fragen zum Code kann Chriesu gefragt werden.
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSplit(cfg){
+      document.title = cfg.title;
+      app.innerHTML = `
+        ${renderTopbar(cfg.title)}
+        <div class="view">
+          <div class="split">
+            ${paneHtml(cfg.top)}
+            ${paneHtml(cfg.bottom)}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderQuad(cfg){
+      document.title = cfg.title;
+      app.innerHTML = `
+        ${renderTopbar(cfg.title)}
+        <div class="view">
+          <div class="quad">
+            ${paneHtml(cfg.leftTop)}
+            ${paneHtml(cfg.rightTop)}
+            ${paneHtml(cfg.leftBottom)}
+            ${paneHtml(cfg.rightBottom)}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSix(cfg){
+      document.title = cfg.title;
+      app.innerHTML = `
+        ${renderTopbar(cfg.title)}
+        <div class="view">
+          <div class="six">
+            ${paneHtml(cfg.leftTop)}
+            ${paneHtml(cfg.rightTop)}
+            ${paneHtml(cfg.leftMid)}
+            ${paneHtml(cfg.rightMid)}
+            ${paneHtml(cfg.leftBottom)}
+            ${paneHtml(cfg.rightBottom)}
+          </div>
+        </div>
+      `;
+    }
+
+    // === Boot ===
+    (function init(){
+      const cfg = configs[setting];
+      if (!setting || !cfg) {
+        renderHome();
+        return;
+      }
+
+      if (cfg.type === "quad") renderQuad(cfg);
+      else if (cfg.type === "six") renderSix(cfg);
+      else renderSplit(cfg);
+
+      // initial + periodic update
+      updateKirchfeldHighlight();
+      setInterval(updateKirchfeldHighlight, 15000);
+
+      // manual check button
+      const checkBtn = document.getElementById("checkBtn");
+      if (checkBtn){
+        checkBtn.addEventListener("click", () => updateKirchfeldHighlight({ showFeedback: true }));
+      }
+
+      // force red cycle button: Auto -> Forced ROT -> Forced AUS -> Auto
+      const forceBtn = document.getElementById("forceBtn");
+      if (forceBtn){
+        forceBtn.addEventListener("click", () => {
+          forceRed = (forceRed === null) ? true : (forceRed === true) ? false : null;
+
+          // aria-pressed only reflects "forced on"
+          forceBtn.setAttribute("aria-pressed", String(forceRed === true));
+
+          // change label to show mode clearly
+          forceBtn.textContent = forceRed === true ? "ROT erzwingen: AN"
+                             : forceRed === false ? "ROT erzwingen: AUS"
+                             : "ROT erzwingen";
+
+          updateKirchfeldHighlight();
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
